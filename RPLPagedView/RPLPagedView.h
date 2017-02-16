@@ -8,42 +8,44 @@
 
 #import <UIKit/UIKit.h>
 
-@class RPLPagedView;
+@protocol RPLPagedViewDatasource;
+@protocol RPLPagedViewDelegate;
 
-@protocol RPLPagedViewDelegate <UIScrollViewDelegate>
+@interface RPLPagedView : UIScrollView
+
+@property(nonatomic, weak) id<RPLPagedViewDatasource> dataSource;
+@property(nonatomic, weak) id<RPLPagedViewDelegate> pagedViewDelegate;
+
+@property(nonatomic, assign) BOOL continuousScroll;
+@property(nonatomic, assign) NSInteger currentPage;
+@property(nonatomic, assign, readonly) NSInteger pagesCount;
+
+- (void)reloadData;
+
+- (UIView*)viewForPageAtIndex:(NSUInteger)index;
+- (UIView*)dequeueReusableViewWithTag:(NSInteger)tag;
+
+- (void)setCurrentPage:(NSInteger)currentPage animated:(BOOL)animated;
+
+- (void)nextPage;
+- (void)previousPage;
+- (void)firstPage;
+- (void)lastPage;
+- (void)switchToPage:(NSNumber*)pageNumber;
+
+@end
+
+@protocol RPLPagedViewDelegate<NSObject>
+
 @optional
-- (void)pagedView:(RPLPagedView *)pagedView pageIndex:(NSInteger)index;
-- (void)pagedView:(RPLPagedView *)pagedView didMoveToPageIndex:(NSInteger)index;
-@end
-
-@protocol RPLPagedViewDatasource <NSObject>
-- (NSInteger)numberOfViewsInPagedView:(RPLPagedView *)pagedView;
-- (UIView*)pagedView:(RPLPagedView *)pagedView viewForIndex:(NSInteger)index;
-@end
-
-@interface RPLPagedView : UIScrollView <UIScrollViewDelegate, UIGestureRecognizerDelegate>
-
-@property (nonatomic, weak)         id<RPLPagedViewDatasource>          dataSource;
-@property (nonatomic, weak)         id<RPLPagedViewDelegate>            delegate;
-
-@property (nonatomic)               BOOL                                continuousScroll;
-@property (nonatomic)               NSInteger                           currentPage;
-@property (nonatomic, readonly)     NSInteger                           pagesCount;
-
--(void)reloadData;
-
-- (UIView *)viewForPageAtIndex:(NSUInteger)index;
-- (UIView *)dequeueReusableViewWithTag:(NSInteger)tag;
-
--(void)setCurrentPage:(NSInteger)currentPage animated:(BOOL)animated;
-
--(void)nextPage;
--(void)previousPage;
--(void)firstPage;
--(void)lastPage;
--(void)switchToPage:(NSNumber*)pageNumber;
+- (void)pagedView:(RPLPagedView*)pagedView pageIndex:(NSInteger)index;
+- (void)pagedView:(RPLPagedView*)pagedView didMoveToPageIndex:(NSInteger)index;
 
 @end
 
+@protocol RPLPagedViewDatasource<NSObject>
 
+- (NSInteger)numberOfViewsInPagedView:(RPLPagedView*)pagedView;
+- (UIView*)pagedView:(RPLPagedView*)pagedView viewForIndex:(NSInteger)index;
 
+@end
